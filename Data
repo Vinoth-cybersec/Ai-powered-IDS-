@@ -1,0 +1,23 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+
+# Load dataset (KDD Cup 1999 dataset example)
+data = pd.read_csv('kddcup99.csv')
+
+# Preprocessing
+# Encode categorical features using LabelEncoder
+label_encoder = LabelEncoder()
+
+# Encoding the categorical features (e.g., protocol_type, service, etc.)
+for column in data.select_dtypes(include='object').columns:
+    data[column] = label_encoder.fit_transform(data[column])
+
+# Define features (X) and target (y)
+X = data.drop(columns=['class'])  # All columns except the target column
+y = data['class']  # Target column (malicious activity)
+
+# Split into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+print("Data Preprocessing Complete.")
