@@ -1,0 +1,38 @@
+import pcapy
+import pickle
+import numpy as np
+
+# Load the trained model
+with open('intrusion_detection_model.pkl', 'rb') as f:
+    model = pickle.load(f)
+
+# Function to extract features from a network packet
+def extract_features(packet):
+    # Example feature extraction (this can be expanded)
+    packet_size = len(packet)
+    protocol = packet[23]  # Example: Protocol field in the IP header (byte 23)
+    
+    # Return the features as a numpy array
+    return np.array([packet_size, protocol])
+
+# Function to capture and classify packets
+def capture_and_predict(interface):
+    # Open the network interface for packet capture
+    cap = pcapy.open_live(interface, 65536, 1, 0)
+    
+    while True:
+        (header, packet) = cap.next()
+        
+        # Extract features from the packet
+        features = extract_features(packet)
+        
+        # Predict if the packet is benign or malicious
+        prediction = model.predict([features])
+        
+        if prediction == 1:  # If it is flagged as malicious
+            print("Malicious packet detected!")
+        else:
+            print("Benign packet detected.")
+
+# Capture packets on a network interface (e.g., eth0)
+capture_and_predict('eth0')
